@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do List App</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      background-image: url('https://raywilliams.ca/wp-content/uploads/2018/03/daily-goal-setting-achieve-success.jpg');
+      background-size: cover;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      font-family:'Times New Roman', Times, serif;
+      font-size: 40px;
+    }
+    h2{
+      text-align: center;
+      font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      font-size: 25px;
+      font-style: italic;
+    }
+    #todo-form {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    #new-task {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      margin-left: 5px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      border-radius: 4px;
+    }
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+    .cartoon {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <h1>📝 Milestone </h1>
+  <h2>"Big goals begin with small milestones."
+  </h2>
+  <form id="todo-form">
+    <input type="text" id="new-task" placeholder="Add a new task..." required />
+    <button type="submit">Add</button>
+  </form>
+  <ul id="task-list"></ul>
+  
+  <img id="cartoon-image" class="cartoon" src="https://i.pinimg.com/originals/d5/a6/45/d5a64536c94247c9f2c80e486861753e.gif" alt="Cartoon" style="width: 100px; height: 100px;">
+
+  <script>
+    const form = document.getElementById("todo-form");
+    const input = document.getElementById("new-task");
+    const taskList = document.getElementById("task-list");
+    const clapSound = document.getElementById("clap-sound");
+    const cartoonImage = document.getElementById("cartoon-image");
+
+    // Load saved tasks from localStorage
+    window.onload = function() {
+      const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      tasks.forEach(task => addTask(task.text, task.completed));
+    };
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      addTask(input.value, false);
+      saveTasks();
+      input.value = "";
+    });
+
+    function addTask(text, completed) {
+      const li = document.createElement("li");
+      const span = document.createElement("span");
+      span.textContent = text;
+      if (completed) span.classList.add("completed");
+
+      span.addEventListener("click", function() {
+        span.classList.toggle("completed");
+        saveTasks();
+      });
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "✅";
+      deleteBtn.addEventListener("click", function() {
+        li.remove();
+        saveTasks();
+        
+        showCartoon();
+      });
+
+      li.appendChild(span);
+      li.appendChild(deleteBtn);
+      taskList.appendChild(li);
+    }
+
+    function saveTasks() {
+      const tasks = [];
+      taskList.querySelectorAll("li").forEach(li => {
+        tasks.push({
+          text: li.querySelector("span").textContent,
+          completed: li.querySelector("span").classList.contains("completed")
+        });
+      });
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function showCartoon() {
+      cartoonImage.style.opacity = 1;
+      setTimeout(function() {
+        cartoonImage.style.opacity = 0;
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
